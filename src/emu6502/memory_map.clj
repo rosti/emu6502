@@ -82,3 +82,26 @@
     (write-byte memory-map address low-part)
     (write-byte memory-map (inc address) high-part)))
 
+(defn data-area
+  "Map a byte array to an area"
+  [memory-map start & byte-arr]
+  (let [array (apply barr byte-arr)
+        end (dec (+ start (count array)))]
+    (map-area memory-map start end aget aset-short array)))
+
+(defn bss-area
+  "Map a zeroed array as an area"
+  [memory-map start size]
+  (let [array (short-array size)
+        end (dec (+ start size))]
+    (map-area memory-map start end aget aset-short array)))
+
+(defn cmp-data
+  "Compare the data at a given address in the memory map with the one provided"
+  [memory-map address & byte-arr]
+  (let [data (vec (apply barr byte-arr))
+        data-size (count data)
+        map-data (mapv #(read-byte memory-map %)
+                       (range address (+ address data-size)))]
+    (= data map-data)))
+
