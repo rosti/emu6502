@@ -23,6 +23,7 @@
                     (data-area 0x100 :00 :30 :34 :12)
                     (data-area 0x400 :40))
           cpu-state (new-cpu-state mem-map)]
+      (set-reg cpu-state :S  0x00)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x1234 (get-reg cpu-state :PC))
@@ -44,6 +45,7 @@
                     (data-area 0x100 :00 :33 :12)
                     (data-area 0x400 :60))
           cpu-state (new-cpu-state mem-map)]
+      (set-reg cpu-state :S  0x00)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (= 0x1234 (get-reg cpu-state :PC))))))
