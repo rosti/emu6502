@@ -12,7 +12,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC immidiate works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x400 :69 :7F))
@@ -32,7 +32,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC zeropage works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :7F)
@@ -54,7 +54,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC zeropage,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :7F)
@@ -76,7 +76,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC absolute works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :7F)
@@ -98,7 +98,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC absolute,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :7F)
@@ -121,7 +121,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC absolute,Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :7F)
@@ -145,7 +145,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC (zeropage,X) works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :00 :07 :08)
@@ -170,7 +170,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "ADC (zeropage),Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)

@@ -11,7 +11,7 @@
       (set-reg cpu-state :A  0x80)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP immidiate works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x400 :C9 :7F))
@@ -29,7 +29,7 @@
       (set-reg cpu-state :A  0x80)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP zeropage works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :7E)
@@ -49,7 +49,7 @@
       (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP zeropage,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :7F)
@@ -69,7 +69,7 @@
       (set-reg cpu-state :A  0x80)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP absolute works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :7F)
@@ -89,7 +89,7 @@
       (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP absolute,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :7F)
@@ -110,7 +110,7 @@
       (set-reg cpu-state :Y  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP absolute,Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :7F)
@@ -132,7 +132,7 @@
       (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP (zeropage,X) works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :00 :07 :08)
@@ -155,7 +155,7 @@
       (set-reg cpu-state :Y  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
-      (is (= 0x23 (get-reg cpu-state :P)))))
+      (is (= 0x27 (get-reg cpu-state :P)))))
   (testing "CMP (zeropage),Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)

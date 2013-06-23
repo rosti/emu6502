@@ -12,7 +12,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND immidiate works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x400 :29 :80))
@@ -21,7 +21,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND zeropage works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :80)
@@ -31,7 +31,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND zeropage works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :80)
@@ -41,7 +41,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND zeropage,X works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :80)
@@ -52,7 +52,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND zeropage,X works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :80)
@@ -63,7 +63,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND absolute works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :80)
@@ -73,7 +73,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND absolute works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :80)
@@ -83,7 +83,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND absolute,X works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :80)
@@ -94,7 +94,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND absolute,X works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :FF :80)
@@ -105,7 +105,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND absolute,Y works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :80)
@@ -116,7 +116,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND absolute,Y works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :FF :80)
@@ -127,7 +127,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND (zeropage,X) works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :00 :07 :08)
@@ -139,7 +139,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND (zeropage,X) works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :00 :07 :08)
@@ -151,7 +151,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "AND (zeropage),Y works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)
@@ -163,7 +163,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :A))
-               (= 0xA0 (get-reg cpu-state :P))))))
+               (= 0xA4 (get-reg cpu-state :P))))))
   (testing "AND (zeropage),Y works and sets Z flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)
@@ -175,5 +175,5 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x22 (get-reg cpu-state :P)))))))
+               (= 0x26 (get-reg cpu-state :P)))))))
  

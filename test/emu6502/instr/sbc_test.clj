@@ -12,7 +12,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC immidiate works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x400 :E9 :80))
@@ -32,7 +32,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC zeropage works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :80)
@@ -54,7 +54,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC zeropage,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :80)
@@ -76,7 +76,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC absolute works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :80)
@@ -98,7 +98,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC absolute,X works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :80)
@@ -121,7 +121,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC absolute,Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :80)
@@ -145,7 +145,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC (zeropage,X) works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :00 :07 :08)
@@ -170,7 +170,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :A))
-               (= 0x63 (get-reg cpu-state :P))))))
+               (= 0x67 (get-reg cpu-state :P))))))
   (testing "SBC (zeropage),Y works, sets N flag and clears C flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)
