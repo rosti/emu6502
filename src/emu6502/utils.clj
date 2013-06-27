@@ -16,3 +16,31 @@
   ([form] (is (not form)))
   ([form msg] (is (not form) msg)))
 
+(defn bytify
+  [value]
+  (bit-and value 0xff))
+
+(defn wordify
+  [value]
+  (bit-and value 0xffff))
+
+(defn inc-byte
+  [value]
+  (bytify (inc value)))
+
+(defn dec-byte
+  [value]
+  (bytify (dec value)))
+
+(defn inc-word
+  [value]
+  (wordify (inc value)))
+
+(defn dec-word
+  [value]
+  (wordify (dec value)))
+
+(defn same-sign?
+  [a b]
+  (zero? (bit-and (bit-xor a b) 0x80)))
+
