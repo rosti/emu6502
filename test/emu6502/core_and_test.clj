@@ -122,7 +122,7 @@
                     (data-area 0x205 :FF :80)
                     (data-area 0x400 :39 :05 :02))
           cpu-state (new-cpu-state mem-map)]
-      (set-reg cpu-state :A  0xF0)
+      (set-reg cpu-state :A  0x7F)
       (set-reg cpu-state :Y  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
@@ -168,7 +168,7 @@
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20  :07 :08)
                     (data-area 0x400 :31 :20)
-                    (data-area 0x807 :80 :FF))
+                    (data-area 0x807 :FF :80))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :A  0x7F)
       (set-reg cpu-state :Y  0x01)
