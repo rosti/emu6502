@@ -54,7 +54,7 @@
         get-byte (area-get-byte area)
         data (area-data area)
         inaddr (- address (area-start area))]
-    (get-byte data inaddr)))
+    (bytify (get-byte data inaddr))))
 
 (defn write-byte
   "Write a byte at the given address in the memory map"
@@ -63,7 +63,7 @@
         put-byte (area-put-byte area)
         data (area-data area)
         inaddr (- address (area-start area))]
-    (put-byte data inaddr value)))
+    (put-byte data inaddr (bytify value))))
 
 (defn read-word
   "Read a word from a given address in the memory map
