@@ -7,7 +7,7 @@
   (testing "BRK works"
     (let [mem-map (-> (empty-memory-map)
                     (bss-area  0x100 0x10)
-                    (data-area 0x400 :00)
+                    (data-area 0x400 :00 :EA)
                     (data-area 0xFFFE :34 :12))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :S  0x0F)
@@ -17,7 +17,7 @@
       (is (and (= 0x1234 (get-reg cpu-state :PC))
                (= 0x24 (get-reg cpu-state :P))
                (= 0x30 (read-byte mem-map 0x10D))
-               (= 0x0401 (read-word mem-map 0x10E))))))
+               (= 0x0402 (read-word mem-map 0x10E))))))
   (testing "RTI works"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x100 :00 :30 :34 :12)
@@ -39,7 +39,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x1234 (get-reg cpu-state :PC))
-               (= 0x0402 (read-word mem-map 0x20E))))))
+               (= 0x0402 (read-word mem-map 0x10E))))))
   (testing "RTS works"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x100 :00 :33 :12)

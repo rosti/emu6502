@@ -6,7 +6,7 @@
 (deftest cpx-instruction-test
   (testing "CPX immidiate works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x400 :E0 :7E))
+                    (data-area 0x400 :E0 :80))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :X  0x80)
       (set-reg cpu-state :PC 0x400)
@@ -23,7 +23,7 @@
       (is (= 0xA0 (get-reg cpu-state :P)))))
   (testing "CPX zeropage works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x20 :7E)
+                    (data-area 0x20 :80)
                     (data-area 0x400 :E4 :20))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :X  0x80)
@@ -42,7 +42,7 @@
       (is (= 0xA0 (get-reg cpu-state :P)))))
   (testing "CPX absolute works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x205 :7E)
+                    (data-area 0x205 :80)
                     (data-area 0x400 :EC :05 :02))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :X  0x80)

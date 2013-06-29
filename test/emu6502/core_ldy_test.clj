@@ -43,7 +43,7 @@
                     (data-area 0x20 :00 :80)
                     (data-area 0x400 :B4 :20))
           cpu-state (new-cpu-state mem-map)]
-      (set-reg cpu-state :Y  0x01)
+      (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :Y))
@@ -53,7 +53,7 @@
                     (data-area 0x20 :80 :00)
                     (data-area 0x400 :B4 :20))
           cpu-state (new-cpu-state mem-map)]
-      (set-reg cpu-state :Y  0x01)
+      (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :Y))
@@ -81,7 +81,7 @@
                     (data-area 0x205 :00 :80)
                     (data-area 0x400 :BC :05 :02))
           cpu-state (new-cpu-state mem-map)]
-      (set-reg cpu-state :Y  0x01)
+      (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x80 (get-reg cpu-state :Y))
@@ -91,7 +91,7 @@
                     (data-area 0x205 :80 :00)
                     (data-area 0x400 :BC :05 :02))
           cpu-state (new-cpu-state mem-map)]
-      (set-reg cpu-state :Y  0x01)
+      (set-reg cpu-state :X  0x01)
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (get-reg cpu-state :Y))

@@ -6,7 +6,7 @@
 (deftest cpy-instruction-test
   (testing "CPY immidiate works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x400 :C0 :7E))
+                    (data-area 0x400 :C0 :80))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :Y  0x80)
       (set-reg cpu-state :PC 0x400)
@@ -23,7 +23,7 @@
       (is (= 0xA0 (get-reg cpu-state :P)))))
   (testing "CPY zeropage works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x20 :7E)
+                    (data-area 0x20 :80)
                     (data-area 0x400 :C4 :20))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :Y  0x80)
@@ -42,7 +42,7 @@
       (is (= 0xA0 (get-reg cpu-state :P)))))
   (testing "CPY absolute works and sets Z,C flags"
     (let [mem-map (-> (empty-memory-map)
-                    (data-area 0x205 :7E)
+                    (data-area 0x205 :80)
                     (data-area 0x400 :CC :05 :02))
           cpu-state (new-cpu-state mem-map)]
       (set-reg cpu-state :Y  0x80)
