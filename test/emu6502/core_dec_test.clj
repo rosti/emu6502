@@ -21,7 +21,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (read-byte mem-map 0x20))
-               (= 0x27 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "DEC zeropage,X works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x20 :00 :81)
@@ -41,7 +41,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (read-byte mem-map 0x21))
-               (= 0x27 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "DEC absolute works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :81)
@@ -59,7 +59,7 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (read-byte mem-map 0x205))
-               (= 0x27 (get-reg cpu-state :P))))))
+               (= 0x26 (get-reg cpu-state :P))))))
   (testing "DEC absolute,X works and sets N flag"
     (let [mem-map (-> (empty-memory-map)
                     (data-area 0x205 :00 :81)
@@ -79,5 +79,5 @@
       (set-reg cpu-state :PC 0x400)
       (run-single cpu-state)
       (is (and (= 0x00 (read-byte mem-map 0x206))
-               (= 0x27 (get-reg cpu-state :P)))))))
+               (= 0x26 (get-reg cpu-state :P)))))))
  
