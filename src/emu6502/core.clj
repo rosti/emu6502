@@ -159,23 +159,23 @@
   (get-reg cpu-state :A))
 
 (defn instruction-ora
-  [cpu-state opcode address]
+  [cpu-state address]
   (bit-arithmetics cpu-state address bit-or))
 
 (defn instruction-and
-  [cpu-state opcode address]
+  [cpu-state address]
   (bit-arithmetics cpu-state address bit-and))
 
 (defn instruction-eor
-  [cpu-state opcode address]
+  [cpu-state address]
   (bit-arithmetics cpu-state address bit-xor))
 
 (defn instruction-sta
-  [cpu-state opcode address]
+  [cpu-state address]
   (store-reg cpu-state :A address))
 
 (defn instruction-lda
-  [cpu-state opcode address]
+  [cpu-state address]
   (load-reg cpu-state :A address))
 
 (defn overflow-dec?
@@ -213,7 +213,7 @@
     trim-value))
 
 (defn instruction-adc
-  [cpu-state opcode address]
+  [cpu-state address]
   (instruction-add cpu-state (read-byte (cpu-state :memory-map) address)))
 
 (defn instruction-sbc-dec
@@ -232,14 +232,14 @@
     trim-value))
 
 (defn instruction-sbc
-  [cpu-state opcode address]
+  [cpu-state address]
   (let [value (bit-xor (read-byte (cpu-state :memory-map) address) 0xFF)
         sub (if (zero? (bit-and (get-reg cpu-state :P) sr-flag-decimal))
               instruction-add instruction-sbc-dec)]
     (sub cpu-state value)))
 
 (defn instruction-cmp
-  [cpu-state opcode address]
+  [cpu-state address]
   (let [result (+ 1 (get-reg cpu-state :A)
                   (bit-xor (read-byte (cpu-state :memory-map) address) 0xFF))]
     (sr-set-carry cpu-state result)
@@ -270,11 +270,13 @@
 (defn group-ora
   "Handle instructions in the ORA group"
   [cpu-state opcode]
+  ; There is no instruction STA imm (opcode 0x89)
   (if (= opcode 0x89) (invalid-opcode-error cpu-state opcode))
   (let [instruction (get-instr opcode)
         func (nth group-ora-instructions instruction)
         addr-mode (nth group-ora-address-modes (get-addr-mode opcode))
-        result (func cpu-state opcode (addr-mode cpu-state opcode))]
+        result (func cpu-state (addr-mode cpu-state opcode))]
+    ; Don't set N, Z flags if the instruction is STA
     (if (not= instruction 0x04) (sr-set-nz cpu-state result))))
 
 ; Major instruction group ASL (cc = 10)
