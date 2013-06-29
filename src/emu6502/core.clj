@@ -2,6 +2,11 @@
   (:use emu6502.memory-map
         emu6502.utils))
 
+(def stack-base 0x0100)
+(def nmi-addr 0xFFFA)
+(def reset-addr 0xFFFC)
+(def break-addr 0xFFFE)
+
 (defn new-cpu-state
   "Create a new 6502 cpu state"
   [memory-map]
@@ -10,7 +15,7 @@
    :Y  (atom 0x00)
    :S  (atom 0xFF)
    :P  (atom 0x24)
-   :PC (atom (read-word memory-map 0xFFFC))
+   :PC (atom (read-word memory-map reset-addr))
    :memory-map memory-map})
 
 (defn get-reg
@@ -63,6 +68,31 @@
   (let [value (get-reg cpu-state source)]
     (set-reg cpu-state destination value)
     value))
+
+; Stack operations
+(defn push-byte
+  [cpu-state value]
+  (let [address (+ stack-base (get-reg cpu-state :S))]
+    (write-byte (cpu-state :memory-map) address value)
+    (update-reg cpu-state :S dec-byte)))
+
+(defn pop-byte
+  [cpu-state]
+  (let [address (+ stack-base (update-reg cpu-state :S inc-byte))]
+    (read-byte (cpu-state :memory-map) address)))
+
+(defn push-word
+  [cpu-state value]
+  (let [low-part (bit-and value 0xFF)
+        high-part (bit-and (bit-shift-right value 8) 0xFF)]
+    (push-byte cpu-state high-part)
+    (push-byte cpu-state low-part)))
+
+(defn pop-word
+  [cpu-state]
+  (let [low-part (pop-byte cpu-state)
+        high-part (pop-byte cpu-state)]
+    (bit-or low-part (bit-shift-left high-part 8))))
 
 ; Opcode helper functions
 (defn get-instr
@@ -149,8 +179,213 @@
                 (get-reg cpu-state :Y)))))
 
 ; Major instruction group BIT (cc = 00)
+
+; Branching subgroup
+(def branch-flags
+  [sr-flag-negative
+   sr-flag-overflow
+   sr-flag-carry
+   sr-flag-zero])
+
+(defn branch-opcode?
+  [opcode]
+  (= 0x10 (bit-and opcode 0x1F)))
+
+(defn eval-branch
+  [cpu-state opcode]
+  (let [flag (nth branch-flags (bit-and (bit-shift-right opcode 6) 3))
+        negative-branch? #(zero? (bit-and (get-reg cpu-state :P) flag))
+        final-branch? (if (zero? (bit-and opcode 0x20))
+                        negative-branch?
+                        #(not (negative-branch?)))
+        offset (read-pc cpu-state)]
+    (if (final-branch?)
+      (update-reg cpu-state :PC #(+ % (if (> offset 127) (- offset 256) offset))))))
+
+; Status register flag clear/set subgroup
+(def flag-clear-opcodes
+  {0x18 sr-flag-carry
+   0x58 sr-flag-irqdisable
+   0xD8 sr-flag-decimal})
+
+(def flag-opcodes [0x18 0x38 0x58 0x78 0xB8 0xD8 0xF8])
+
+(defn flag-opcode?
+  [opcode]
+  (includes? flag-opcodes opcode))
+
+(defn eval-flag-opcode
+  [cpu-state opcode]
+  (if (= opcode 0xB8)
+    (sr-update-flag cpu-state sr-flag-overflow (fn [] false)) ; CLV doesn't match our schemes
+    (sr-update-flag cpu-state (flag-clear-opcodes (bit-and opcode 0xDF))
+                    #(not (zero? (bit-and opcode 0x20))))))
+
+; Subgroup transfers
+(def transfer-instructions
+  { 0xA8 [:A :Y]
+    0x98 [:Y :A]
+    0x8A [:X :A]
+    0x9A [:X :S]
+    0xAA [:A :X]
+    0xBA [:S :X]})
+
+(defn transfer-instruction-opcode?
+  [opcode]
+  (includes? (keys transfer-instructions) opcode))
+
+(defn transfer-instruction
+  [cpu-state opcode]
+  (if-not (transfer-instruction-opcode? opcode)
+    (invalid-opcode-error cpu-state opcode))
+  (sr-set-nz cpu-state (apply transfer-reg cpu-state (transfer-instructions opcode))))
+
+; INC/DEC X/Y instructions
+(def xy-inc-dec-opcodes
+  {0x88 [:Y dec-byte]
+   0xC8 [:Y inc-byte]
+   0xE8 [:X inc-byte]
+   0xCA [:X dec-byte]})
+
+(defn xy-inc-dec-opcode?
+  [opcode]
+  (includes? (keys xy-inc-dec-opcodes) opcode))
+
+(defn eval-xy-inc-dec
+  [cpu-state opcode]
+  (let [reg (first (xy-inc-dec-opcodes opcode))
+        operation (last (xy-inc-dec-opcodes opcode))]
+    (update-reg cpu-state reg operation)
+    (sr-set-nz cpu-state (get-reg cpu-state reg))))
+
+; Push to/pop from stack instructions
+(def push-pop-instructions
+  {0x08 #(push-byte % (get-reg % :P))
+   0x28 #(set-reg % :P (pop-byte %))
+   0x48 #(push-byte % (get-reg % :A))
+   0x68 #(sr-set-nz % (set-reg % :A (pop-byte %)))})
+
+(defn push-pop-opcode?
+  [opcode]
+  (includes? (keys push-pop-instructions) opcode))
+
+(defn eval-push-pop
+  [cpu-state opcode]
+  ((push-pop-instructions opcode) cpu-state))
+
+; BRK, RTI, JSR and RTS instructions
+(defn instruction-brk
+  [cpu-state]
+  (advance-pc cpu-state)
+  (push-word cpu-state (get-reg cpu-state :PC))
+  (push-byte cpu-state (bit-or (get-reg cpu-state :P) sr-flag-break))
+  (sr-update-flag cpu-state sr-flag-irqdisable (fn [] true))
+  (set-reg cpu-state :PC (read-word (cpu-state :memory-map) break-addr)))
+
+(defn instruction-rti
+  [cpu-state]
+  (set-reg cpu-state :P (bit-and (pop-byte cpu-state) 0xEF))
+  (set-reg cpu-state :PC (pop-word cpu-state)))
+
+(defn instruction-jsr
+  [cpu-state]
+  (let [target-pc (addr-mode-abs cpu-state 0x20)]
+    (push-word cpu-state (dec-word (get-reg cpu-state :PC)))
+    (set-reg cpu-state :PC target-pc)))
+
+(defn instruction-rts
+  [cpu-state]
+  (set-reg cpu-state :PC (inc-word (pop-word cpu-state))))
+
+(def brk-jsr-instructions
+  {0x00 instruction-brk
+   0x20 instruction-jsr
+   0x40 instruction-rti
+   0x60 instruction-rts})
+
+(defn brk-jsr-opcode?
+  [opcode]
+  (includes? (keys brk-jsr-instructions) opcode))
+
+(defn eval-brk-jsr-opcode
+  [cpu-state opcode]
+  ((brk-jsr-instructions opcode) cpu-state))
+
+; The actual BIT instruction group
+(defn instruction-bit
+  [cpu-state address]
+  (let [value (read-byte (cpu-state :memory-map) address)]
+    (sr-update-flag cpu-state sr-flag-zero #(zero? (bit-and value (get-reg cpu-state :A))))
+    (update-reg cpu-state :P #(bit-or (bit-and value 0xC0) (bit-and % 0x3F)))))
+
+(defn instruction-jmp
+  [cpu-state address]
+  (set-reg cpu-state :PC address))
+
+(defn instruction-sty
+  [cpu-state address]
+  (store-reg cpu-state :Y address))
+
+(defn instruction-ldy
+  [cpu-state address]
+  (sr-set-nz cpu-state (load-reg cpu-state :Y address)))
+
+(defn compare-reg
+  [cpu-state address reg]
+  (let [result (+ 1 (get-reg cpu-state reg)
+                  (bit-xor (read-byte (cpu-state :memory-map) address) 0xFF))]
+    (sr-set-carry cpu-state result)
+    (sr-set-nz cpu-state result)))
+
+(def bit-group-opcodes
+  [{}
+   {:func instruction-bit
+    1 addr-mode-zpg
+    3 addr-mode-abs}
+   {:func instruction-jmp
+    3 addr-mode-abs}
+   {:func #(instruction-jmp %1 (read-word (%1 :memory-map) %2))
+    3 addr-mode-abs}
+   {:func instruction-sty
+    1 addr-mode-zpg
+    3 addr-mode-abs
+    5 addr-mode-zpg-x}
+   {:func instruction-ldy
+    0 addr-mode-imm
+    1 addr-mode-zpg
+    3 addr-mode-abs
+    5 addr-mode-zpg-x
+    7 addr-mode-abs-x}
+   {:func #(compare-reg %1 %2 :Y)
+    0 addr-mode-imm
+    1 addr-mode-zpg
+    3 addr-mode-abs}
+   {:func #(compare-reg %1 %2 :X)
+    0 addr-mode-imm
+    1 addr-mode-zpg
+    3 addr-mode-abs}])
+
+(defn eval-bit-group-opcode
+  [cpu-state opcode]
+  (if (zero? (get-instr opcode)) (invalid-opcode-error cpu-state opcode))
+  (let [instr (get-instr opcode)
+        mode (get-addr-mode opcode)
+        desc (nth bit-group-opcodes instr)
+        func (desc :func)
+        mode-handler (desc mode)]
+    (if-not mode-handler (invalid-opcode-error cpu-state opcode))
+    (func cpu-state (mode-handler cpu-state opcode))))
+
 (defn group-bit
-  [cpu-state opcode])
+  [cpu-state opcode]
+  ((cond (branch-opcode? opcode) eval-branch
+        (flag-opcode? opcode) eval-flag-opcode
+        (transfer-instruction-opcode? opcode) transfer-instruction
+        (xy-inc-dec-opcode? opcode) eval-xy-inc-dec
+        (push-pop-opcode? opcode) eval-push-pop
+        (brk-jsr-opcode? opcode) eval-brk-jsr-opcode
+        :else eval-bit-group-opcode)
+     cpu-state opcode))
 
 ; Major instruction group ORA (cc = 01)
 (defn bit-arithmetics
@@ -281,25 +516,6 @@
 
 ; Major instruction group ASL (cc = 10)
 
-; Subgroup transfers
-(def transfer-instructions
-  { 0xA8 [:A :Y]
-    0x98 [:Y :A]
-    0x8A [:X :A]
-    0x9A [:X :S]
-    0xAA [:A :X]
-    0xBA [:S :X]})
-
-(defn transfer-instruction-opcode?
-  [opcode]
-  (includes? (keys transfer-instructions) opcode))
-
-(defn transfer-instruction
-  [cpu-state opcode]
-  (if-not (transfer-instruction-opcode? opcode)
-    (invalid-opcode-error cpu-state opcode))
-  (sr-set-nz cpu-state (apply transfer-reg cpu-state (transfer-instructions opcode))))
-
 ; Subgroup ASL
 (defn instruction-asl
   [cpu-state old-value]
@@ -427,17 +643,12 @@
                   ; Don't set N,Z flags if the instruction is STX
                   (if-not (= instr 4) (sr-set-nz cpu-state result))))))
 
-(defn instruction-dex
-  [cpu-state]
-  (update-reg cpu-state :X dec-byte)
-  (sr-set-nz cpu-state (get-reg cpu-state :X)))
-
 (defn group-asl
   [cpu-state opcode]
   (cond (= 0xEA opcode) ; NOP instruction
           nil
-        (= 0xCA opcode) ; DEX instruction
-          (instruction-dex cpu-state)
+        (xy-inc-dec-opcode? opcode) ; DEX instruction
+          (eval-xy-inc-dec cpu-state opcode)
         (transfer-instruction-opcode? opcode) ; Transfer mode (TAX, TXA, TSX, TXS) instruction
           (transfer-instruction cpu-state opcode)
         :else (invoke-asl-subgroup cpu-state opcode)))
