@@ -11,6 +11,11 @@
   [start end value]
   (and (>= value start) (>= end value)))
 
+(defn includes?
+  "Check if element is in collection"
+  [col el]
+  (not (empty? (filter #(= % el) col))))
+
 (defn is-not
   "A short way to say (is (not ... in tests"
   ([form] (is (not form)))
@@ -30,7 +35,7 @@
 
 (defn dec-byte
   [value]
-  (bytify (dec value)))
+  (bytify (+ value 0xFF)))
 
 (defn inc-word
   [value]
@@ -38,7 +43,7 @@
 
 (defn dec-word
   [value]
-  (wordify (dec value)))
+  (wordify (+ value 0xFFFF)))
 
 (defn same-sign?
   [a b]
