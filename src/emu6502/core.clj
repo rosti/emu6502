@@ -604,8 +604,7 @@
    {:func instruction-stx
       1 addr-mode-zpg
       3 addr-mode-abs
-      5 addr-mode-zpg-y
-      7 addr-mode-abs-y}
+      5 addr-mode-zpg-y}
    {:func instruction-ldx
       0 addr-mode-imm
       1 addr-mode-zpg
