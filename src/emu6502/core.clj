@@ -59,15 +59,12 @@
   "Load register with the byte at the given address and return the value"
   [cpu-state reg address]
   (let [value (read-byte (cpu-state :memory-map) address)]
-    (set-reg cpu-state reg value)
-    value))
+    (set-reg cpu-state reg value)))
 
 (defn transfer-reg
   "Transfer value of one register to another and return the value"
   [cpu-state source destination]
-  (let [value (get-reg cpu-state source)]
-    (set-reg cpu-state destination value)
-    value))
+  (set-reg cpu-state destination (get-reg cpu-state source)))
 
 ; Stack operations
 (defn push-byte
@@ -390,8 +387,7 @@
 ; Major instruction group ORA (cc = 01)
 (defn bit-arithmetics
   [cpu-state address func]
-  (update-reg cpu-state :A #(func % (read-byte (cpu-state :memory-map) address)))
-  (get-reg cpu-state :A))
+  (update-reg cpu-state :A #(func % (read-byte (cpu-state :memory-map) address))))
 
 (defn instruction-ora
   [cpu-state address]
@@ -444,8 +440,7 @@
         full-value (adder cpu-state curr-a value)
         trim-value (bytify full-value)]
     (sr-set-carry cpu-state full-value)
-    (set-reg cpu-state :A trim-value)
-    trim-value))
+    (set-reg cpu-state :A trim-value)))
 
 (defn instruction-adc
   [cpu-state address]
@@ -463,8 +458,7 @@
         trim-value (bytify full-high)]
     (sr-update-flag cpu-state sr-flag-overflow #(overflow-dec? curr-a value full-value))
     (sr-set-carry cpu-state full-high)
-    (set-reg cpu-state :A trim-value)
-    trim-value))
+    (set-reg cpu-state :A trim-value)))
 
 (defn instruction-sbc
   [cpu-state address]
