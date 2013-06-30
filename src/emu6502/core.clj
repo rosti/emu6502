@@ -16,6 +16,7 @@
    :S  (atom 0xFF)
    :P  (atom 0x24)
    :PC (atom (read-word memory-map reset-addr))
+   :continious-run (atom true)
    :memory-map memory-map})
 
 (defn get-reg
@@ -656,7 +657,47 @@
 (defn run-single
   "Run a single instruction"
   [cpu-state]
-  (let [opcode (read-pc cpu-state)
-        group-handler (nth opcode-groups (bit-and opcode 0x03))]
-    (group-handler cpu-state opcode)))
+  (locking cpu-state
+    (let [opcode (read-pc cpu-state)
+          group-handler (nth opcode-groups (bit-and opcode 0x03))]
+      (group-handler cpu-state opcode))))
+
+(defn trigger-reset
+  "Trigger a software reset of the CPU"
+  [cpu-state]
+  (locking cpu-state
+    (set-reg cpu-state :PC (read-word (cpu-state :memory-map) reset-addr))))
+
+; Don't call from outside this module
+(defn internal-interrupt
+  [cpu-state vector-addr]
+  (push-word cpu-state (get-reg cpu-state :PC))
+  (push-byte cpu-state (get-reg cpu-state :P))
+  (sr-update-flag cpu-state sr-flag-irqdisable (fn [] true))
+  (set-reg cpu-state :PC (read-word (cpu-state :memory-map) vector-addr)))
+
+(defn trigger-nmi
+  "Trigger NMI (Non Maskable Interrupt)"
+  [cpu-state]
+  (locking cpu-state
+    (internal-interrupt cpu-state nmi-addr)))
+
+(defn trigger-irq
+  "Trigger IRQ interrupt"
+  [cpu-state]
+  (locking cpu-state
+    (if (zero? (bit-and (get-reg cpu-state :P) sr-flag-irqdisable))
+      (internal-interrupt cpu-state break-addr))))
+
+(defn stop-continious
+  "Stop currently running continious execution"
+  [cpu-state]
+  (reset! (cpu-state :continious-run) false))
+
+(defn run-continious
+  "Run instructions until stopped (via stop-continious) or attempt to run an invalid opcode"
+  [cpu-state]
+  (reset! (cpu-state :continious-run) true)
+  (while (deref (cpu-state :continious-run))
+    (run-single cpu-state)))
 
