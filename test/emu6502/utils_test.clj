@@ -14,9 +14,9 @@
   (testing "between returns true on correct input"
     (is (between? 3 5 4)))
   (testing "between returns false when value is before range"
-    (is-not (between? 3 5 1)))
+    (is (not (between? 3 5 1))))
   (testing "between returns false when value is after range"
-    (is-not (between? 3 5 6)))
+    (is (not (between? 3 5 6))))
   (testing "between returns true when bottom boundary"
     (is (between? 3 5 3)))
   (testing "between returns true when top boundary"

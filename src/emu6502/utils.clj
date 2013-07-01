@@ -1,5 +1,4 @@
-(ns emu6502.utils
-  (:use clojure.test))
+(ns emu6502.utils)
 
 (defn barr
   "A helper function for easy writing of some bytes to a Java short array."
@@ -15,11 +14,6 @@
   "Check if element is in collection"
   [col el]
   (not (empty? (filter #(= % el) col))))
-
-(defn is-not
-  "A short way to say (is (not ... in tests"
-  ([form] (is (not form)))
-  ([form msg] (is (not form) msg)))
 
 (defn bytify
   [value]

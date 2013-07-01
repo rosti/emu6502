@@ -61,5 +61,5 @@
     (testing "cmp-data returns true if byte arrays are the same"
       (is (cmp-data mem-map 0x0100 :4A :A5 :3D :4B)))
     (testing "cmp-data returns false if byte arrays are different"
-      (is-not (cmp-data mem-map 0x0100 :4A :B6 :85 :4B)))))
+      (is (not (cmp-data mem-map 0x0100 :4A :B6 :85 :4B))))))
 
