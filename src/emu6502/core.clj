@@ -34,6 +34,13 @@
   [cpu-state reg update]
   (swap! (cpu-state reg) update))
 
+(defn register-dump
+  "Return a string with the current states of the CPU registers"
+  [cpu-state]
+  (locking cpu-state
+    (apply format "A: %02X, X: %02X, Y: %02X\nS: %02X, P: %02X, PC: %04X\n"
+           (map #(get-reg cpu-state %) [:A :X :Y :S :P :PC]))))
+
 (defn advance-pc
   "Increment PC and return its previous value"
   [cpu-state]
@@ -49,7 +56,8 @@
 (defn invalid-opcode-error
   "Raise exception when invalid opcode is detected"
   [cpu-state opcode]
-  (throw (RuntimeException. (str "Invalid opcode: " opcode))))
+  (throw (RuntimeException.
+           (format "Invalid opcode: %02X\n\n%s" opcode (register-dump cpu-state)))))
 
 (defn store-reg
   "Store register to the given address"
