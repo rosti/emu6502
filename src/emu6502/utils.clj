@@ -43,3 +43,7 @@
   [a b]
   (zero? (bit-and (bit-xor a b) 0x80)))
 
+(defn each
+  [func coll]
+  (doseq [x coll] (func x)))
+
