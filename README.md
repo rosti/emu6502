@@ -10,4 +10,4 @@ See tests for now.
 
 Copyright © 2013 Rostislav Georgiev
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under [Simplified BSD License](http://opensource.org/licenses/BSD-2-Clause).
