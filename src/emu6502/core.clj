@@ -16,7 +16,7 @@
    :S  (atom 0xFF)
    :P  (atom 0x24)
    :PC (atom (read-word memory-map reset-addr))
-   :continious-run (atom true)
+   :continuous-run (atom true)
    :memory-map memory-map})
 
 (defn get-reg
@@ -696,15 +696,15 @@
     (if (zero? (bit-and (get-reg cpu-state :P) sr-flag-irqdisable))
       (internal-interrupt cpu-state break-addr))))
 
-(defn stop-continious
-  "Stop currently running continious execution"
+(defn stop-continuous
+  "Stop currently running continuous execution"
   [cpu-state]
-  (reset! (cpu-state :continious-run) false))
+  (reset! (cpu-state :continuous-run) false))
 
-(defn run-continious
-  "Run instructions until stopped (via stop-continious) or attempt to run an invalid opcode"
+(defn run-continuous
+  "Run instructions until stopped (via stop-continuous) or attempt to run an invalid opcode"
   [cpu-state]
-  (reset! (cpu-state :continious-run) true)
-  (while (deref (cpu-state :continious-run))
+  (reset! (cpu-state :continuous-run) true)
+  (while (deref (cpu-state :continuous-run))
     (run-single cpu-state)))
 
